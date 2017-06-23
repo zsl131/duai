@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN"
+	  xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorator="fragments/adminModel">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+		<title>微信用户列表</title>
+		<link type="text/css" rel="stylesheet" href="/admin/bus/admin-account.css"/>
+		<script src="/admin/bus/admin-account.js"></script>
+		<script type="text/javascript">
+			$(function() {
+				$(".delete-obj-href").deleteFun();
+			});
+		</script>
+		<style>
+			.head-img {border-radius:5px; width:50px;}
+		</style>
+	</head>
+<body>
+	<div th:fragment="content" th:remove="tag">
+		<div class="header lighter smaller blue">
+			<h3><span class="glyphicon glyphicon-th-list"></span>&nbsp;微信用户列表（<span th:text="${datas.getTotalElements()}"></span>）</h3>
+			<div th:replace="admin/account/nav :: content" th:remove="tag"></div>
+		</div>
+
+		<div th:replace="admin/account/filter :: content" th:remove="tag"></div>
+
+		<div class="table-responsive">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>头像</th>
+						<th>昵称</th>
+						<th>邀请人</th>
+						<th>状态</th>
+						<th>类型</th>
+						<th>电话</th>
+						<th>日期</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+
+				<tr th:each="obj : ${datas}">
+					<td><a th:href="${obj.headimgurl}" target="_blank"><img th:src="${obj.headimgurl}" class="head-img"/></a></td>
+					<td th:text="${obj.nickname}"></td>
+					<td th:text="${obj.followUserName ne null ? obj.followUserName:'-'}"></td>
+					<td>
+						<div th:remove="tag" th:switch="${obj.status}">
+							<span th:case="'1'">关注</span>
+							<span th:case="'0'" style="color:#F00">取消</span>
+						</div>
+					</td>
+					<td>
+						<div class="set-type-div" th:switch="${obj.type}">
+							<span th:case="'0'">顾客</span>
+							<span th:case="'1'">店员</span>
+							<span th:case="'2'">经理</span>
+							<span th:case="'5'">股东</span>
+							<span th:case="'10'">管理员</span>
+							<ul class="type-ul" th:attr="accountId=${obj.id}">
+								<li val="0">设为顾客</li>
+								<li val="1">设为店员</li>
+								<li val="2">设为经理</li>
+								<li val="5">设为股东</li>
+								<li val="10">设为管理员</li>
+							</ul>
+						</div>
+					</td>
+					<td th:text="${obj.phone ne null and obj.phone ne '' ? obj.phone : '未绑定'}"></td>
+					<td th:text="${obj.createTime}"></td>
+					<td>
+						<div class="action-buttons">
+							<a class="delete-obj-href red auth" sn="AdminAccountController.update" th:title="'确定同步【'+${obj.nickname}+'】吗？'" th:href="'/admin/account/update/'+${obj.id}">
+								<i class="fa fa-pencil"></i>
+							</a>
+						</div>
+					</td>
+				</tr>
+			</table>
+
+			<div th:include="fragments/page :: pager" th:remove="tag"></div>
+		</div>
+	</div>
+</body>
+</html>
